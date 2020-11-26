@@ -9,7 +9,7 @@ export default class DynatraceDatasource {
     this.id = instanceSettings.jsonData.id;
     this.token = instanceSettings.jsonData.token;
 
-    this.url = `${instanceSettings.url}/e/${this.id}/api/v1/metrics`;
+    this.url = `${instanceSettings.url}/e/${this.id}/api/v2/metrics`;
 
     this.headers = { Authorization: `Api-Token ${this.token}` };
 
@@ -44,7 +44,7 @@ export default class DynatraceDatasource {
           aggregationType: targets[t].aggregation,
           endTimestamp: toTs,
           startTimestamp: fromTs,
-          timeseriesId: targets[t].target,
+          metricsId: targets[t].target,
         },
       };
       if (targets[t].aggregation === 'PERCENTILE') {
@@ -98,7 +98,7 @@ export default class DynatraceDatasource {
       data: {
         aggregationType: 'AVG',
         relativeTime: 'hour',
-        timeseriesId: target,
+        metricsId: target,
       },
     };
 
@@ -127,16 +127,16 @@ export default class DynatraceDatasource {
     return this.doRequest({
       method: 'GET',
     }).then((res) => {
-      const entry = _.filter(res.data, item =>
-        (item.timeseriesId === query))[0];
+      const entry = _.filter(res.data.metrics, item =>
+        (item.metricsId === query))[0];
 
       return entry;
     }).catch(() => (false));
   }
 
   static getTsNames(result) {
-    return _.map(result.data, d => (
-      { text: d.timeseriesId, value: d.timeseriesId }));
+    return _.map(result.data.metrics, d => (
+      { text: d.metricsId, value: d.metricsId }));
   }
 }
 
